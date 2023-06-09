@@ -28,13 +28,20 @@ impl Color {
     }
 
     pub fn to_24_bit(&self) -> Color24b {
-        return Color24b::new_from_f32(self.vec.x * 255.0, self.vec.y * 255.0, self.vec.z * 255.0);
+        return Color24b::new_from_f32(self.vec.x * 256.0, self.vec.y * 256.0, self.vec.z * 256.0);
     }
 
     pub fn from_vec(vec : Vector3f) -> Color{
         return Color {
             vec
         };
+    }
+
+    pub fn max_color() -> Color{
+        return Color::new(1.0,1.0,1.0);
+    }
+    pub fn min_color() -> Color{
+        return Color::new(0.0,0.0,0.0);
     }
 }
 

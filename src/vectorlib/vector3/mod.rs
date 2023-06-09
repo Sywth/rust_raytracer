@@ -1,3 +1,5 @@
+use rand;
+
 #[derive(Copy)]
 pub struct Vector3f {
     pub x: f32,
@@ -38,10 +40,41 @@ impl Vector3f {
     pub fn new(x: f32, y: f32, z: f32) -> Vector3f {
         return Vector3f { x, y, z };
     }
+    pub fn uniform(s : f32) -> Vector3f{
+        return Vector3f::new(s,s,s);
+    }
 
     pub fn lerp<'a, 'b>(start : &'a Vector3f, target: &'b Vector3f, t : f32) -> Vector3f {
         let diff = target.clone() - start.clone();
         return start.clone() + diff * t;
+    }
+
+    pub fn one() -> Vector3f{
+        return Vector3f::new(1.0, 1.0, 1.0);
+    }
+    pub fn zero() -> Vector3f{
+        return Vector3f::new(0.0, 0.0, 0.0);
+    }
+    pub fn random() -> Vector3f{
+        return Vector3f::new(
+            rand::random::<f32>(),
+            rand::random::<f32>(),
+            rand::random::<f32>(),
+        );
+    }
+
+    pub fn random_range(min : f32, max : f32) -> Vector3f{
+        return (Vector3f::random() * (max-min)) + Vector3f::uniform(min);
+    }
+
+    pub fn unit_x() -> Vector3f{
+        return Vector3f::new(1.0, 0.0, 0.0);
+    }
+    pub fn unit_y() -> Vector3f{
+        return Vector3f::new(0.0, 1.0, 0.0);
+    }
+    pub fn unit_z() -> Vector3f{
+        return Vector3f::new(0.0, 0.0, 1.0);
     }
 }
 
@@ -93,6 +126,13 @@ impl ops::Div<f32> for Vector3f {
         self.y /= lambda; 
         self.z /= lambda;
         return self;
+    }
+}
+
+impl ops::Neg for Vector3f {
+    type Output = Vector3f;
+    fn neg(self) -> Self::Output {
+        return Vector3f::new(-self.x, -self.y, -self.z);
     }
 }
 
