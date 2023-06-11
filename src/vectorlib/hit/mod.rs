@@ -1,18 +1,20 @@
 use std::rc::Rc;
 
 use crate::vectorlib::{point3::*, ray::*, vector3::*};
+use crate::material::Material;
 
 #[derive(Copy, Clone)]
-pub struct HitData {
+pub struct HitData<'a> {
     pub at: Point3,
     pub normal: Vector3f,
     pub t: f32,
     pub hit_front_face: bool,
+    pub material : Option<&'a dyn Material>,
 }
 
-impl HitData {
+impl<'a> HitData<'a> {
     // outward_normal most likely will be same as normal but incase
-    pub fn new(t: f32, hit_at: Point3, normal: Vector3f, ray_direction: &Vector3f, outward_normal: &Vector3f) -> HitData 
+    pub fn new(t: f32, hit_at: Point3, normal: Vector3f, ray_direction: &Vector3f, outward_normal: &Vector3f) -> HitData<'a> 
     {
         let mut hit_data = HitData {
             at: hit_at,
@@ -20,6 +22,7 @@ impl HitData {
             t,
             // Set to some default for now
             hit_front_face: (false),
+            material : None,
         };
 
         // Determine if we hit front or back

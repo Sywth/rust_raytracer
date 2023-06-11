@@ -1,4 +1,4 @@
-use crate::vectorlib::{point3::Point3, vector3::Vector3f};
+use crate::vectorlib::{point3::Point3, vector3::Vector3f, sphere::*};
 
 use super::{hit::HittableList, vector3::{Normalize, Lerp}};
 
@@ -30,19 +30,31 @@ impl Ray {
 }
 
 pub trait Fireable {
-    fn find_color_from_ray_in_world(&self, meshes : &HittableList) -> Vector3f;
+    fn find_color_from_ray_in_world(&self, meshes : &HittableList, recursions_left : u16) -> Vector3f;
 }
 
+const SHADOW_ACNE_TOLERANCE : f32 = 0.0001;
 impl Fireable for Ray{
-    fn find_color_from_ray_in_world(&self, meshes : &HittableList) -> Vector3f {
-        let hit = meshes.hit(self, 0.0, std::f32::INFINITY);
-        if hit.is_some() {
-            let color: Vector3f = (hit.unwrap().normal + Vector3f::one()) * 0.5 ;
-            return color;
+    fn find_color_from_ray_in_world(&self, meshes : &HittableList, bounces_left : u16) -> Vector3f {
+        if bounces_left < 1{
+            // Return black as we hit nothing that emits light
+            return Vector3f::zero();
+        }
+
+        let maybe_hit: Option<super::hit::HitData> = meshes.hit(self, SHADOW_ACNE_TOLERANCE, std::f32::INFINITY);
+        if maybe_hit.is_some() {
+            let hit = maybe_hit.unwrap();
+
+            let target = hit.at + hit.normal + random_in_hemisphere(&hit.normal); 
+            let child_ray = Ray::new(
+                hit.at,
+                target - hit.at,
+            );
+            // With every bounce we lose half the energy contribution to color 
+            return 0.60 * child_ray.find_color_from_ray_in_world(meshes, bounces_left - 1);
         }
     
-        // Hit nothing so get background color
-
+        // Hit nothing so get naturally emissive background color
         let unit_direction = self.direction().unit_vector();
         let t = 0.5 * (unit_direction.y + 1.0); // Moves t from range [-1,1] to [0,1]
     

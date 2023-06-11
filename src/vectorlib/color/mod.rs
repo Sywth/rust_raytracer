@@ -43,6 +43,13 @@ impl Color {
     pub fn min_color() -> Color{
         return Color::new(0.0,0.0,0.0);
     }
+
+    pub fn gamma_two_correct(&mut self) -> &Self{
+        self.vec.x = self.vec.x.sqrt();
+        self.vec.y = self.vec.y.sqrt();
+        self.vec.z = self.vec.z.sqrt();
+        return self;
+    }
 }
 
 impl Color24b {

@@ -1,4 +1,5 @@
 use rand;
+use crate::utils::inv_sqrt;
 
 #[derive(Copy)]
 pub struct Vector3f {
@@ -49,6 +50,10 @@ impl Vector3f {
         return start.clone() + diff * t;
     }
 
+    pub fn faster_unit_vec(self) -> Self{
+        return self * inv_sqrt(self.x * self.x + self.y * self.y + self.z * self.z);
+    }
+
     pub fn one() -> Vector3f{
         return Vector3f::new(1.0, 1.0, 1.0);
     }
@@ -61,6 +66,10 @@ impl Vector3f {
             rand::random::<f32>(),
             rand::random::<f32>(),
         );
+    }
+
+    pub fn get_reflected(&self, normal : &Vector3f) -> Vector3f{
+        return self.clone() - ((2.0 * self.dot(normal)) * normal.clone());
     }
 
     pub fn random_range(min : f32, max : f32) -> Vector3f{

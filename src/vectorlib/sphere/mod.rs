@@ -51,22 +51,51 @@ impl<'a> Hittable<'a> for Sphere {
     }
 }
 
-const INVERSE_SQRT_3_OVER_TWO : f32 = 0.816496580927726; // (1.0/3.0).sqrt()
+const INVERSE_SQRT_THREE : f32 = 0.5773502691896257; // (1.0/3.0).sqrt()
+const TWICE_INVERSE_SQRT_THREE : f32 = 1.1547005383792515; // (1.0/3.0).sqrt() * 2
 
-pub fn get_random_in_unit_sphere() -> Vector3f{
-    // v is a vector in postive octet of a sphere radius 2 (quatre of a hemisphere)
-    let mut v = Vector3f::new(
-        rand::random::<f32>() * INVERSE_SQRT_3_OVER_TWO, 
-        rand::random::<f32>() * INVERSE_SQRT_3_OVER_TWO, 
-        rand::random::<f32>() * INVERSE_SQRT_3_OVER_TWO
+fn random_in_unit_sphere_hack() -> Vector3f{
+    // v is a vector in sphere of radius 
+    return Vector3f::new(
+        (rand::random::<f32>() * TWICE_INVERSE_SQRT_THREE) - INVERSE_SQRT_THREE, 
+        (rand::random::<f32>() * TWICE_INVERSE_SQRT_THREE) - INVERSE_SQRT_THREE, 
+        (rand::random::<f32>() * TWICE_INVERSE_SQRT_THREE) - INVERSE_SQRT_THREE,
     );
+}
 
-    let complement = Vector3f::new(
-        rand::random::<f32>(), 
-        rand::random::<f32>(),
-        rand::random::<f32>()
-    );
-    // Subtract at most 1 means the new range for the vector is ([-1..1],[-1..1],[-1..1]) 
-    v = v - complement;
-    return v;
+fn random_in_unit_sphere() -> Vector3f{
+    loop {
+        let v = Vector3f::new(
+            (rand::random::<f32>()*2.0)-1.0,
+            (rand::random::<f32>()*2.0)-1.0,
+            (rand::random::<f32>()*2.0)-1.0
+        );
+
+        if v.magnitude() > 1.0 {
+            continue;
+        }
+        
+        return v;
+    }
+}
+
+fn random_in_unit_lambertian() -> Vector3f{
+    return random_in_unit_sphere().unit_vector();
+}
+
+pub fn random_vec_in_unit_sphere() ->Vector3f{
+    if (crate::constants::QUICK_RENDER) {
+        return random_in_unit_sphere_hack();
+    }
+    return random_in_unit_sphere();
+}
+
+pub fn random_in_hemisphere(normal : &Vector3f) -> Vector3f{
+    let in_unit_sphere : Vector3f = random_in_unit_sphere_hack();
+
+    // If its in the hemisphere opposite the normal
+    if in_unit_sphere.dot(normal) < 0.0 {
+        return -in_unit_sphere;
+    }
+    return in_unit_sphere;
 }
