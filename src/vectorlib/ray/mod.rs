@@ -45,13 +45,16 @@ impl Fireable for Ray{
         if maybe_hit.is_some() {
             let hit = maybe_hit.unwrap();
 
-            let target = hit.at + hit.normal + random_in_hemisphere(&hit.normal); 
-            let child_ray = Ray::new(
-                hit.at,
-                target - hit.at,
-            );
+            let attenuation : &Vector3f;
+            let scattered_ray : Ray;
+            {
+                let attenuation_and_scattered_ray = hit.material.scatter(self, &hit);
+                attenuation = attenuation_and_scattered_ray.0;
+                scattered_ray = attenuation_and_scattered_ray.1;
+            }
+
             // With every bounce we lose half the energy contribution to color 
-            return 0.60 * child_ray.find_color_from_ray_in_world(meshes, bounces_left - 1);
+            return attenuation.multiply_element_wise(&scattered_ray.find_color_from_ray_in_world(meshes, bounces_left - 1));
         }
     
         // Hit nothing so get naturally emissive background color

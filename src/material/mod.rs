@@ -12,8 +12,14 @@ impl Vector3f{
     }
 }
 
-struct Lambertian {
+pub struct Lambertian {
     albedo: Vector3f,
+}
+
+impl Lambertian{
+    pub fn new(albedo : Vector3f) -> Lambertian{
+        return Lambertian{albedo};
+    }
 }
 
 impl Material for Lambertian{
@@ -33,8 +39,14 @@ impl Material for Lambertian{
     }
 }
 
-struct Metal {
+pub struct Metal {
     albedo: Vector3f,
+}
+
+impl Metal{
+    pub fn new(albedo : Vector3f) -> Metal{
+        return Metal{albedo};
+    }
 }
 
 impl Material for Metal{

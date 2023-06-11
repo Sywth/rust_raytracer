@@ -1,6 +1,6 @@
 pub const FOLDER_NAME: &str = "./render";
-pub const IMAGE_WIDTH: u16 = 1920;
-pub const IMAGE_HEIGHT: u16 = 1080;
+pub const IMAGE_WIDTH: u16 = 400;
+pub const IMAGE_HEIGHT: u16 = 300;
 
 pub const ASPECT_RATIO: f32 = IMAGE_WIDTH as f32 / IMAGE_HEIGHT as f32;
 pub const VIEWPORT_HEIGHT: f32 = 2.0;

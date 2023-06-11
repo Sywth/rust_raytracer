@@ -1,20 +1,33 @@
+use std::rc::Rc;
+
 use rand::{random, rngs::ThreadRng};
 
 use crate::vectorlib::{hit::*, point3::*, ray::*, vector3::*};
+use crate::material::*;
 
-#[derive(Copy, Clone)]
-pub struct Sphere {
+pub struct Sphere<'a> {
     pub center: Point3,
     pub radius: f32,
+    pub material : &'a Rc<&'a dyn Material>,
 }
 
-impl Sphere {
-    pub fn new(center: Vector3f, radius: f32) -> Sphere {
-        return Sphere { center, radius };
+impl<'a>  Clone for Sphere<'a>  {
+    fn clone(&self) -> Self {
+        Sphere {
+            center: self.center,
+            radius: self.radius,
+            material: self.material,
+        }
     }
 }
 
-impl<'a> Hittable<'a> for Sphere {
+impl<'a>  Sphere<'a>  {
+    pub fn new(center: Vector3f, radius: f32, material : &Rc<&'a dyn Material>) -> Sphere<'a> {
+        return Sphere { center, radius, material };
+    }
+}
+
+impl<'a> Hittable<'a> for Sphere<'a> {
     fn hit(self: &Self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitData> {
         let oc = ray.origin().clone() - self.center;
 
@@ -47,7 +60,7 @@ impl<'a> Hittable<'a> for Sphere {
         // Vector from center of circle to point of intersection turnt into a unit vector 
         let normal = (hit_point - self.center) / self.radius;
         
-        return Some(HitData::new(t, ray.at(t), normal, ray.direction(), &normal));
+        return Some(HitData::new(t, ray.at(t), normal, ray.direction(), &normal, self.material));
     }
 }
 

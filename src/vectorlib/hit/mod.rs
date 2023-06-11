@@ -1,20 +1,20 @@
 use std::rc::Rc;
 
 use crate::vectorlib::{point3::*, ray::*, vector3::*};
-use crate::material::Material;
+use crate::material::*;
 
-#[derive(Copy, Clone)]
-pub struct HitData<'a> {
+#[derive(Clone)]
+pub struct HitData<'a>{
     pub at: Point3,
     pub normal: Vector3f,
     pub t: f32,
     pub hit_front_face: bool,
-    pub material : Option<&'a dyn Material>,
+    pub material : &'a Rc<&'a dyn Material>,
 }
 
-impl<'a> HitData<'a> {
+impl<'a> HitData<'a>{
     // outward_normal most likely will be same as normal but incase
-    pub fn new(t: f32, hit_at: Point3, normal: Vector3f, ray_direction: &Vector3f, outward_normal: &Vector3f) -> HitData<'a> 
+    pub fn new(t: f32, hit_at: Point3, normal: Vector3f, ray_direction: &Vector3f, outward_normal: &Vector3f, material : &'a Rc<&'a dyn Material>) -> HitData<'a>
     {
         let mut hit_data = HitData {
             at: hit_at,
@@ -22,7 +22,7 @@ impl<'a> HitData<'a> {
             t,
             // Set to some default for now
             hit_front_face: (false),
-            material : None,
+            material : material,
         };
 
         // Determine if we hit front or back
@@ -72,9 +72,10 @@ impl<'a> HittableList<'a> {
             }
 
             // If hit something and less than previous (or t_max if no prev) save it as new best, continue
-            if hit.unwrap().t < closest_t {
-                closest_hit = hit;
-                closest_t = hit.unwrap().t;
+            let hit: HitData = hit.unwrap();
+            if hit.t < closest_t {
+                closest_hit = Some(hit.clone());
+                closest_t = hit.t;
                 continue;
             }
         }

@@ -85,6 +85,11 @@ impl Vector3f {
     pub fn unit_z() -> Vector3f{
         return Vector3f::new(0.0, 0.0, 1.0);
     }
+
+    pub fn multiply_element_wise(&self, other : &Vector3f) -> Self{
+        return Vector3f::new(self.x * other.x, self.y * other.y, self.z * other.z);
+    }
+
 }
 
 impl ops::Add<Vector3f> for Vector3f {

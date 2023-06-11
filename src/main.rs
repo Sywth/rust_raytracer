@@ -7,6 +7,10 @@ mod material;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use std::rc::Rc;
+
+#[macro_use]
+extern crate lazy_static;
 
 use chrono;
 use rand::prelude::*;
@@ -16,6 +20,12 @@ use rand::SeedableRng;
 use camera::*;
 use constants::*;
 use vectorlib::{color::*, hit::*, point3::*, ray::*, sphere::*, vector3::*};
+
+use crate::material::{Lambertian, Material};
+
+lazy_static! {
+    static ref MATT_RED : Lambertian = Lambertian::new(Vector3f::new(0.8, 0.3, 0.3));
+}
 
 fn main() -> std::io::Result<()> {
     let file_name: String = format!(
@@ -61,10 +71,14 @@ fn main() -> std::io::Result<()> {
     */
     
     // Start timer
-    let start = chrono::offset::Local::now();
+    let start: chrono::DateTime<chrono::Local> = chrono::offset::Local::now();
 
-    meshes.add(Sphere::new(Vector3f::new(0.0, 0.0, -1.0), 0.5));
-    meshes.add(Sphere::new(Vector3f::new(0.0, -100.5, -1.0), 100.0));
+    let mat : dyn Material = &*MATT_RED;
+    let rc_matt_red_ref_ref: &Rc<&dyn Material> = &Rc::new(&mat);
+    
+    // let matt_green = Rc::new(Lambertian::new(Vector3f::new(0.502, 0.502, 0.0)));
+    meshes.add(Sphere::new(Vector3f::new(0.0, 0.0, -1.0), 0.5,rc_matt_red_ref_ref));
+    meshes.add(Sphere::new(Vector3f::new(0.0, -100.5, -1.0), 100.0,rc_matt_red_ref_ref));
 
     let camera = Camera::new(
         VIEWPORT_WIDTH,
