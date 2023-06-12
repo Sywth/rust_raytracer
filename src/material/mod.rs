@@ -1,3 +1,7 @@
+use std::cell::Ref;
+
+use rand::random;
+
 use crate::vectorlib::{color::Color, hit::HitData, ray::{Ray, self}, vector3::*, sphere::*};
 
 pub trait Material {
@@ -12,6 +16,7 @@ impl Vector3f{
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Lambertian {
     albedo: Vector3f,
 }
@@ -39,21 +44,32 @@ impl Material for Lambertian{
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Metal {
     albedo: Vector3f,
+    roughness : f32,
 }
 
 impl Metal{
-    pub fn new(albedo : Vector3f) -> Metal{
-        return Metal{albedo};
+    pub fn new(albedo : Vector3f, roughness : f32) -> Metal{
+        return Metal{albedo, roughness};
+    }
+
+    pub fn new_perfect(albedo : Vector3f) -> Metal{
+        return Metal{albedo, roughness : 0.0};
     }
 }
 
 impl Material for Metal{
     fn scatter(&self, ray_in: &Ray, hit_data: &HitData) -> (&Vector3f , Ray) {
-        let reflected = ray_in.direction().get_reflected(&hit_data.normal);
-        let scattered_ray = Ray::new(hit_data.at, reflected);
+        let mut reflected = ray_in.direction().get_reflected(&hit_data.normal);
 
+        reflected.x += random::<f32>() * self.roughness;
+        reflected.y += random::<f32>() * self.roughness;
+        reflected.z += random::<f32>() * self.roughness;
+
+        let scattered_ray = Ray::new(hit_data.at, reflected);
+        
         return (&self.albedo, scattered_ray);
     }
 

@@ -9,12 +9,12 @@ pub struct HitData<'a>{
     pub normal: Vector3f,
     pub t: f32,
     pub hit_front_face: bool,
-    pub material : &'a Rc<&'a dyn Material>,
+    pub material : &'a dyn Material,
 }
 
 impl<'a> HitData<'a>{
     // outward_normal most likely will be same as normal but incase
-    pub fn new(t: f32, hit_at: Point3, normal: Vector3f, ray_direction: &Vector3f, outward_normal: &Vector3f, material : &'a Rc<&'a dyn Material>) -> HitData<'a>
+    pub fn new(t: f32, hit_at: Point3, normal: Vector3f, ray_direction: &Vector3f, outward_normal: &Vector3f, material : &'a dyn Material) -> HitData<'a>
     {
         let mut hit_data = HitData {
             at: hit_at,

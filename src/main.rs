@@ -9,9 +9,6 @@ use std::io::Write;
 use std::path::Path;
 use std::rc::Rc;
 
-#[macro_use]
-extern crate lazy_static;
-
 use chrono;
 use rand::prelude::*;
 use rand::rngs::StdRng;
@@ -21,11 +18,8 @@ use camera::*;
 use constants::*;
 use vectorlib::{color::*, hit::*, point3::*, ray::*, sphere::*, vector3::*};
 
-use crate::material::{Lambertian, Material};
+use crate::material::{Lambertian, Material, Metal};
 
-lazy_static! {
-    static ref MATT_RED : Lambertian = Lambertian::new(Vector3f::new(0.8, 0.3, 0.3));
-}
 
 fn main() -> std::io::Result<()> {
     let file_name: String = format!(
@@ -73,12 +67,18 @@ fn main() -> std::io::Result<()> {
     // Start timer
     let start: chrono::DateTime<chrono::Local> = chrono::offset::Local::now();
 
-    let mat : dyn Material = &*MATT_RED;
-    let rc_matt_red_ref_ref: &Rc<&dyn Material> = &Rc::new(&mat);
-    
-    // let matt_green = Rc::new(Lambertian::new(Vector3f::new(0.502, 0.502, 0.0)));
-    meshes.add(Sphere::new(Vector3f::new(0.0, 0.0, -1.0), 0.5,rc_matt_red_ref_ref));
-    meshes.add(Sphere::new(Vector3f::new(0.0, -100.5, -1.0), 100.0,rc_matt_red_ref_ref));
+    let matte_green = Lambertian::new(Vector3f::new(0.502, 0.502, 0.0));
+
+    let metal_yellow = Metal::new(Vector3f::new(0.98,0.96,0.56),0.5);
+    let metal_cyan = Metal::new(Vector3f::new(0.73,0.87,0.93),0.5);
+    let metal_magenta = Metal::new(Vector3f::new(1.0,0.64,0.97),0.5);
+
+    meshes.add(Sphere::new(Vector3f::new(0.0, -100.5, -1.0), 100.0,Box::new(matte_green)));
+
+    meshes.add(Sphere::new(Vector3f::new(-1.0, 0.0, -1.3), 0.5,Box::new(metal_yellow)));
+    meshes.add(Sphere::new(Vector3f::new(0.0, 0.0, -1.0), 0.5,Box::new(metal_cyan)));
+    meshes.add(Sphere::new(Vector3f::new(1.0, 0.0, -1.3), 0.5,Box::new(metal_magenta)));
+
 
     let camera = Camera::new(
         VIEWPORT_WIDTH,
