@@ -63,11 +63,7 @@ impl Metal{
 impl Material for Metal{
     fn scatter(&self, ray_in: &Ray, hit_data: &HitData) -> (&Vector3f , Ray) {
         let mut reflected = ray_in.direction().get_reflected(&hit_data.normal);
-
-        reflected.x += random::<f32>() * self.roughness;
-        reflected.y += random::<f32>() * self.roughness;
-        reflected.z += random::<f32>() * self.roughness;
-
+        reflected = reflected + self.roughness * random_vec_in_unit_sphere();
         let scattered_ray = Ray::new(hit_data.at, reflected);
         
         return (&self.albedo, scattered_ray);

@@ -69,9 +69,9 @@ fn main() -> std::io::Result<()> {
 
     let matte_green = Lambertian::new(Vector3f::new(0.502, 0.502, 0.0));
 
-    let metal_yellow = Metal::new(Vector3f::new(0.98,0.96,0.56),0.5);
-    let metal_cyan = Metal::new(Vector3f::new(0.73,0.87,0.93),0.5);
-    let metal_magenta = Metal::new(Vector3f::new(1.0,0.64,0.97),0.5);
+    let metal_yellow = Metal::new(Vector3f::new(0.98,0.96,0.56),0.25);
+    let metal_cyan = Lambertian::new(Vector3f::new(0.73,0.87,0.93));
+    let metal_magenta = Metal::new(Vector3f::new(1.0,0.64,0.97),0.05);
 
     meshes.add(Sphere::new(Vector3f::new(0.0, -100.5, -1.0), 100.0,Box::new(matte_green)));
 
